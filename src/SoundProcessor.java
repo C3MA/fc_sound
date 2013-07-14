@@ -110,7 +110,7 @@ public class SoundProcessor implements KJDigitalSignalProcessor {
 		int a_teil = (int) Math.ceil(a / 255);
 		int i;
 		
-		System.out.println(a + " - "+ a_teil +" / "+ a_rest);
+//		System.out.println(a + " - "+ a_teil +" / "+ a_rest);
 		for (i=0; i < a_teil; i++) {
 			f.add(new Pixel(2, i+3, Color.BLUE));
 		}
@@ -119,7 +119,7 @@ public class SoundProcessor implements KJDigitalSignalProcessor {
 		int b_rest = b % 255;
 		int b_teil = (int) Math.ceil(a / 255);
 		
-		System.out.println(b + " - "+ b_teil +" / "+ b_rest);
+//		System.out.println(b + " - "+ b_teil +" / "+ b_rest);
 		for (i=0; i < b_teil; i++) {
 			f.add(new Pixel(2+2, i+3, Color.BLUE));
 		}

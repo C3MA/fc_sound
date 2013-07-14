@@ -6,7 +6,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.SourceDataLine;
 
 import kjdss.KJDigitalSignalSynchronizer;
-import kjdss.ui.KJScopeAndSpectrumAnalyzer;
 
 class Test_No1 {
 	private static final int READ_BUFFER_SIZE = 1024 * 4;
