@@ -16,7 +16,7 @@ import kjdss.KJDigitalSignalSynchronizer;
 import kjdss.KJDigitalSignalSynchronizer.Context;
 
 
-public class SoundProcessor implements KJDigitalSignalProcessor {
+public class SoundProcessor_3Part implements KJDigitalSignalProcessor {
 
 	public static final float DEFAULT_VU_METER_DECAY   = 0.02f;
 	
@@ -27,7 +27,7 @@ public class SoundProcessor implements KJDigitalSignalProcessor {
 	private int height = 0;
 	private RawClient rc;
 	
-	public SoundProcessor(String addr) throws Exception{
+	public SoundProcessor_3Part(String addr) throws Exception{
 		rc = new RawClient(addr);
         rc.requestInformation();
         

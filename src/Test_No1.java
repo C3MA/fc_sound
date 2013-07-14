@@ -29,7 +29,8 @@ class Test_No1 {
                     false);
 		    wAs = AudioSystem.getAudioInputStream(decodedFormat, in);
 		    
-		    SoundProcessor sp = new SoundProcessor(adress);
+//		    SoundProcessor sp = new SoundProcessor(adress);
+		    SoundProcessor_3Part sp = new SoundProcessor_3Part(adress);
 		    
 		    dss = new KJDigitalSignalSynchronizer();
 			
