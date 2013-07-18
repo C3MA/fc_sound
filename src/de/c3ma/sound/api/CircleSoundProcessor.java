@@ -21,6 +21,9 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
     public static final float DEFAULT_VU_METER_DECAY = 0.02f;
 
     protected float vuDecay = DEFAULT_VU_METER_DECAY;
+    
+    private static int TIMER_RESET = 6;
+    
     float[] oldVolume;
 
     private int width = 0;
@@ -33,10 +36,13 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
 
     private int r;
 
+    private int count = 0;
+    
     public CircleSoundProcessor(String addr) throws Exception {
         rc = new RawClient(addr);
         rc.requestInformation();
 
+        
         while (true) {
             Thread.sleep(10);
             FullcircleSerialize got = rc.readNetwork();
@@ -69,6 +75,7 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
                     rc.close();
                     System.exit(1);
                 }
+                
             }
         }
 
@@ -92,7 +99,7 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
 
         for (int a = 0; a < pChannels.length; a++) {
 
-            System.out.println("Channel " + a + ":" + pChannels[a].length);
+//            System.out.println("Channel " + a + ":" + pChannels[a].length);
 
             for (int b = 0; b < pChannels[a].length; b++) {
 
@@ -123,11 +130,13 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
 
         final Frame f = new Frame();
 
-        int a = (int) (oldVolume[0] * ((float) (height * 255) - 32));
-        int b = (int) (oldVolume[1] * ((float) (height * 255) - 32));
+        int a = (int) (oldVolume[0] * ((float) (height) ));
+        int b = (int) (oldVolume[1] * ((float) (height) ));
 
         int louder = Math.max(a, b);
         
+        System.out.println("Louder : " + louder + "\t" + count);
+        count += louder;
         new RainbowEllipse(this.xmittel, this.ymittel, this.r, this.r) {
 
             @Override
@@ -135,7 +144,7 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
                 f.add(new Pixel(x, y, c));                        
             }
             
-        }.drawEllipse(louder);
+        }.drawEllipse(count);
 
         try {
             rc.sendFrame(f);
