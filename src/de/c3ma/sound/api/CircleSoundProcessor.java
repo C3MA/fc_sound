@@ -1,4 +1,4 @@
-package de.c3ma.sound.api;
+    package de.c3ma.sound.api;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -114,7 +114,6 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
             if (wVolume[a] >= (oldVolume[a] - wSadfrr)) {
                 oldVolume[a] = wVolume[a];
             } else {
-
                 oldVolume[a] -= wSadfrr;
 
                 if (oldVolume[a] < 0) {
@@ -130,12 +129,17 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
 
         final Frame f = new Frame();
 
-        int a = (int) (oldVolume[0] * ((float) (height) ));
-        int b = (int) (oldVolume[1] * ((float) (height) ));
+        int a = 0;
+        int b = 0;
 
+        
+        if ((oldVolume[0] - wVolume[0]) > DEFAULT_VU_METER_DECAY)
+            a =(int) (oldVolume[0] * ((float) (height) ));
+        if ((oldVolume[1] - wVolume[1]) > DEFAULT_VU_METER_DECAY)
+            b = (int) (oldVolume[1] * ((float) (height) ));
+        
         int louder = Math.max(a, b);
         
-        System.out.println("Louder : " + louder + "\t" + count);
         count += louder;
         new RainbowEllipse(this.xmittel, this.ymittel, this.r, this.r) {
 
