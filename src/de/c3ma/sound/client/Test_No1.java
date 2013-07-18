@@ -1,9 +1,13 @@
+package de.c3ma.sound.client;
+
 import java.io.File;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.SourceDataLine;
+
+import de.c3ma.sound.api.SoundProcessor_3Part;
 
 import kjdss.KJDigitalSignalSynchronizer;
 

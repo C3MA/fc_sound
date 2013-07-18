@@ -1,3 +1,4 @@
+package de.c3ma.sound.api;
 import java.awt.Color;
 import java.io.IOException;
 
@@ -16,20 +17,18 @@ import kjdss.KJDigitalSignalSynchronizer;
 import kjdss.KJDigitalSignalSynchronizer.Context;
 
 
-public class SoundProcessor_3Part implements KJDigitalSignalProcessor {
+public class SoundProcessor implements KJDigitalSignalProcessor {
 
 	public static final float DEFAULT_VU_METER_DECAY   = 0.02f;
 	
 	protected float vuDecay = DEFAULT_VU_METER_DECAY;
-	float[][] oldVolume;
+	float[] oldVolume;
 	
 	private int width = 0;
 	private int height = 0;
 	private RawClient rc;
 	
-	final int splitPart = 3;
-	
-	public SoundProcessor_3Part(String addr) throws Exception{
+	public SoundProcessor(String addr) throws Exception{
 		rc = new RawClient(addr);
         rc.requestInformation();
         
@@ -42,7 +41,7 @@ public class SoundProcessor_3Part implements KJDigitalSignalProcessor {
 	                /* Extract the expected resolution and use these values for the request */
 	            	InfoAnswer ia = (InfoAnswer) got;
 	
-	            	height = ia.getHeight()-3;
+	            	height = ia.getHeight();
 	            	width = ia.getWidth();
 	            	
 	                /* when we got the resolution of the map, in this example we now want to start to send something */
@@ -62,7 +61,7 @@ public class SoundProcessor_3Part implements KJDigitalSignalProcessor {
 	
 	@Override
 	public void initialize(int arg0, SourceDataLine arg1) {
-		oldVolume = new float[ arg1.getFormat().getChannels() ][splitPart];
+		oldVolume = new float[ arg1.getFormat().getChannels() ];
 	}
 
 	@Override
@@ -72,41 +71,34 @@ public class SoundProcessor_3Part implements KJDigitalSignalProcessor {
 		
 		float pFrrh = arg0.getFrameRatioHint();
 		
-		float[][] wVolume = new float[ pChannels.length ][splitPart];
+		float[] wVolume = new float[ pChannels.length ];
 		
 		float wSadfrr = ( vuDecay * pFrrh );
 
 		for( int a = 0; a < pChannels.length; a++ ) {
 			
-			int parts = (int) Math.floor(pChannels[a].length / splitPart);
-			int tmpPart = parts;
-			int actPart = 0;
+			System.out.println("Channel "+ a +":"+ pChannels[a].length);
 			
 			for( int b = 0; b < pChannels[ a ].length; b++ ) {
 				
 				float wAmp = Math.abs( pChannels[ a ][ b ] );
 				
-				if ( wAmp > wVolume[ a ][actPart] ) {
-					wVolume[ a ][actPart] = wAmp;
+				if ( wAmp > wVolume[ a ] ) {
+					wVolume[ a ] = wAmp;
 				}
-				if(b > tmpPart) {
-					tmpPart += parts;
-					actPart ++;
-				}
+				
 			}
 			
-			for (int i=0; i<splitPart; i++){
-				if ( wVolume[ a ][i] >= ( oldVolume[ a ][i] - wSadfrr ) ) {
-					oldVolume[ a ][i] = wVolume[ a ][i];
-				} else {
-	
-					oldVolume[ a ][i] -= wSadfrr;
-					
-					if ( oldVolume[ a ][i] < 0 ) {
-						oldVolume[ a ][i] = 0;
-					}
-					
+			if ( wVolume[ a ] >= ( oldVolume[ a ] - wSadfrr ) ) {
+				oldVolume[ a ] = wVolume[ a ];
+			} else {
+
+				oldVolume[ a ] -= wSadfrr;
+				
+				if ( oldVolume[ a ] < 0 ) {
+					oldVolume[ a ] = 0;
 				}
+				
 			}
 			
 //			System.out.println(a +" - "+  oldVolume[ a ] * ((float) (height*255) - 32)  );
@@ -114,31 +106,28 @@ public class SoundProcessor_3Part implements KJDigitalSignalProcessor {
 		}
 		
 		Frame f = new Frame();
+				
+		int a = (int) (oldVolume[ 0 ] * ((float) (height*255) - 32));
+		int b = (int) (oldVolume[ 1 ] * ((float) (height*255) - 32));
+		
+		int a_rest = a % 255;
+		int a_teil = (int) Math.ceil(a / 255);
 		int i;
 		
-		for(int c=0; c<splitPart; c++){
-		
-			int a = (int) (oldVolume[ 0 ][c] * ((float) (height*255) - 32));
-			int a_rest = a % 255;
-			int a_teil = (int) Math.ceil(a / 255);
-			
-			for (i=0; i < a_teil; i++) {
-				f.add(new Pixel(c, i+3, Color.BLUE));
-			}
-			f.add(new Pixel(c, i+3, new Color(a_rest,0,0)));
+//		System.out.println(a + " - "+ a_teil +" / "+ a_rest);
+		for (i=0; i < a_teil; i++) {
+			f.add(new Pixel(2, i+3, Color.BLUE));
 		}
+		f.add(new Pixel(2, i+3, new Color(a_rest,0,0)));
 		
-		for(int c=0; c<splitPart; c++){
-			
-			int b = (int) (oldVolume[ 1 ][c] * ((float) (height*255) - 32));
-			int b_rest = b % 255;
-			int b_teil = (int) Math.ceil(b / 255);
-			
-			for (i=0; i < b_teil; i++) {
-				f.add(new Pixel(c+4, i+3, Color.BLUE));
-			}
-			f.add(new Pixel(c+4, i+3, new Color(b_rest,0,0)));
+		int b_rest = b % 255;
+		int b_teil = (int) Math.ceil(a / 255);
+		
+//		System.out.println(b + " - "+ b_teil +" / "+ b_rest);
+		for (i=0; i < b_teil; i++) {
+			f.add(new Pixel(2+2, i+3, Color.BLUE));
 		}
+		f.add(new Pixel(2+2, i+3, new Color(b_rest,0,0)));
 		
         try {
 			rc.sendFrame(f);
