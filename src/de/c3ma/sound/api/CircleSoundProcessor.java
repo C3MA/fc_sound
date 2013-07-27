@@ -138,17 +138,21 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
         if ((oldVolume[1] - wVolume[1]) > DEFAULT_VU_METER_DECAY)
             b = (int) (oldVolume[1] * ((float) (height) ));
         
-        int louder = Math.max(a, b);
+        final int loudertmp = Math.max(a, b);
+        final int louder = loudertmp + 1;
         
-        count += louder;
-        new RainbowEllipse(this.xmittel, this.ymittel, this.r, this.r) {
+        count ++;
+        new RainbowEllipse(this.xmittel, this.ymittel, this.r + louder / 20, this.r + louder / 20) {
 
             @Override
             protected void drawPixel(int x, int y, Color c) {
-                f.add(new Pixel(x, y, c));                        
+                Color c2 = new Color(Math.min(255, c.getRed() * louder), 
+                        Math.min(255, c.getGreen() * louder), 
+                        Math.min(255, c.getBlue() * louder) );
+                f.add(new Pixel(x, y, c2));                        
             }
             
-        }.drawEllipse(count);
+        }.drawEllipse(count / 100);
 
         try {
             rc.sendFrame(f);
