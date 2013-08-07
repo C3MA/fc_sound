@@ -5,6 +5,7 @@ import javax.sound.sampled.SourceDataLine;
 
 import kjdss.KJDigitalSignalProcessor;
 import kjdss.KJDigitalSignalSynchronizer;
+import de.c3ma.animation.RainbowEllipse;
 import de.c3ma.fullcircle.RawClient;
 import de.c3ma.proto.fctypes.Frame;
 import de.c3ma.proto.fctypes.FullcircleSerialize;
@@ -27,6 +28,10 @@ public class SoundProcessor_3Part implements KJDigitalSignalProcessor {
 	private RawClient rc;
 	
 	final int splitPart = 3;
+
+    private int a_max;
+
+    private int b_max;
 	
 	public SoundProcessor_3Part(String addr) throws Exception{
 		rc = new RawClient(addr);
@@ -120,11 +125,16 @@ public class SoundProcessor_3Part implements KJDigitalSignalProcessor {
 			int a = (int) (oldVolume[ 0 ][c] * ((float) (height*255) - 32));
 			int a_rest = a % 255;
 			int a_teil = (int) Math.ceil(a / 255);
-			
+
+            a_max = Math.max(a_teil + 1, a_max);
 			for (i=0; i < a_teil; i++) {
-				f.add(new Pixel(c, i+3, new SimpleColor(0, 0, 255)));
+			    SimpleColor color = RainbowEllipse.mapRainbowColor(i, 0, a_max);
+				f.add(new Pixel(c, height-i, color));
 			}
-			f.add(new Pixel(c, i+3, new SimpleColor(a_rest,0,0)));
+			SimpleColor color = RainbowEllipse.mapRainbowColor(a_max, 0, a_max);
+			f.add(new Pixel(c, height-i, new SimpleColor(color.getRed() * a_rest / 255,
+			        color.getGreen() * a_rest / 255,
+			        color.getBlue() * a_rest / 255)));
 		}
 		
 		for(int c=0; c<splitPart; c++){
@@ -133,10 +143,15 @@ public class SoundProcessor_3Part implements KJDigitalSignalProcessor {
 			int b_rest = b % 255;
 			int b_teil = (int) Math.ceil(b / 255);
 			
+			b_max = Math.max(b_teil + 1, b_max);
 			for (i=0; i < b_teil; i++) {
-				f.add(new Pixel(c+4, i+3, new SimpleColor(0, 0, 255)));
+			    SimpleColor color = RainbowEllipse.mapRainbowColor(i, 0, b_max);
+                f.add(new Pixel(c+4, height-i, color));
 			}
-			f.add(new Pixel(c+4, i+3, new SimpleColor(b_rest,0,0)));
+			SimpleColor color = RainbowEllipse.mapRainbowColor(b_max, 0, b_max);
+            f.add(new Pixel(c+4, height-i, new SimpleColor(color.getRed() * b_rest / 255,
+                    color.getGreen() * b_rest / 255,
+                    color.getBlue() * b_rest / 255)));
 		}
 		
         try {
