@@ -1,20 +1,18 @@
 package de.c3ma.sound.api;
-import java.awt.Color;
 import java.io.IOException;
 
 import javax.sound.sampled.SourceDataLine;
 
+import kjdss.KJDigitalSignalProcessor;
+import kjdss.KJDigitalSignalSynchronizer;
 import de.c3ma.fullcircle.RawClient;
 import de.c3ma.proto.fctypes.Frame;
 import de.c3ma.proto.fctypes.FullcircleSerialize;
 import de.c3ma.proto.fctypes.InfoAnswer;
-import de.c3ma.proto.fctypes.Meta;
 import de.c3ma.proto.fctypes.Pixel;
 import de.c3ma.proto.fctypes.Start;
 import de.c3ma.proto.fctypes.Timeout;
-import kjdss.KJDigitalSignalProcessor;
-import kjdss.KJDigitalSignalSynchronizer;
-import kjdss.KJDigitalSignalSynchronizer.Context;
+import de.c3ma.types.SimpleColor;
 
 
 public class SoundProcessor implements KJDigitalSignalProcessor {
@@ -116,18 +114,18 @@ public class SoundProcessor implements KJDigitalSignalProcessor {
 		
 //		System.out.println(a + " - "+ a_teil +" / "+ a_rest);
 		for (i=0; i < a_teil; i++) {
-			f.add(new Pixel(2, i+3, Color.BLUE));
+			f.add(new Pixel(2, i+3, new SimpleColor(0, 0, 255)));
 		}
-		f.add(new Pixel(2, i+3, new Color(a_rest,0,0)));
+		f.add(new Pixel(2, i+3, new SimpleColor(a_rest,0,0)));
 		
 		int b_rest = b % 255;
 		int b_teil = (int) Math.ceil(a / 255);
 		
 //		System.out.println(b + " - "+ b_teil +" / "+ b_rest);
 		for (i=0; i < b_teil; i++) {
-			f.add(new Pixel(2+2, i+3, Color.BLUE));
+			f.add(new Pixel(2+2, i+3, new SimpleColor(0, 0, 255)));
 		}
-		f.add(new Pixel(2+2, i+3, new Color(b_rest,0,0)));
+		f.add(new Pixel(2+2, i+3, new SimpleColor(b_rest,0,0)));
 		
         try {
 			rc.sendFrame(f);

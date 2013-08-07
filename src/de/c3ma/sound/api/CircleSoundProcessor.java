@@ -1,6 +1,5 @@
     package de.c3ma.sound.api;
 
-import java.awt.Color;
 import java.io.IOException;
 
 import javax.sound.sampled.SourceDataLine;
@@ -15,6 +14,7 @@ import de.c3ma.proto.fctypes.InfoAnswer;
 import de.c3ma.proto.fctypes.Pixel;
 import de.c3ma.proto.fctypes.Start;
 import de.c3ma.proto.fctypes.Timeout;
+import de.c3ma.types.SimpleColor;
 
 public class CircleSoundProcessor implements KJDigitalSignalProcessor {
 
@@ -145,8 +145,8 @@ public class CircleSoundProcessor implements KJDigitalSignalProcessor {
         new RainbowEllipse(this.xmittel, this.ymittel, this.r + louder / 20, this.r + louder / 20) {
 
             @Override
-            protected void drawPixel(int x, int y, Color c) {
-                Color c2 = new Color(Math.min(255, c.getRed() * louder), 
+            protected void drawPixel(int x, int y, SimpleColor c) {
+                SimpleColor c2 = new SimpleColor(Math.min(255, c.getRed() * louder), 
                         Math.min(255, c.getGreen() * louder), 
                         Math.min(255, c.getBlue() * louder) );
                 f.add(new Pixel(x, y, c2));                        
