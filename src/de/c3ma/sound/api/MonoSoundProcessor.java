@@ -88,13 +88,13 @@ public class MonoSoundProcessor implements KJDigitalSignalProcessor {
 		for( int a = 0; a < pChannels.length; a++ ) {
 			
 			int parts = (int) Math.floor(pChannels[a].length / splitPart);
+//			System.out.println("Parts : " + parts);
 			int tmpPart = parts;
 			int actPart = 0;
 			
 			for( int b = 0; b < pChannels[ a ].length; b++ ) {
 				
 				float wAmp = Math.abs( pChannels[ a ][ b ] );
-				
 				if ( wAmp > wVolume[actPart] ) {
 					wVolume[actPart] = wAmp;
 				}
@@ -104,8 +104,9 @@ public class MonoSoundProcessor implements KJDigitalSignalProcessor {
 				}
 			}
 			
-			for (int i=0; i<splitPart; i++){
-	            System.out.println( i + "\t" + wSadfrr );
+			for (int i=0; i<splitPart; i++) {
+
+                System.out.println( i + "\t" + wVolume[i] );    
 				if ( wVolume[i] >= ( oldVolume[i] - wSadfrr ) ) {
 					oldVolume[i] = wVolume[i];
 				} else {
@@ -118,8 +119,6 @@ public class MonoSoundProcessor implements KJDigitalSignalProcessor {
 					
 				}
 			}
-			
-			
 		}
 		
 		Frame f = new Frame();
