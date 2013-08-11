@@ -2,8 +2,8 @@ package de.c3ma.sound.client;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.Line;
-import javax.sound.sampled.Line.Info;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
@@ -17,8 +17,8 @@ class Micro2Wall {
 
     public static void main(String args[]) throws Exception {
 
-        if (args.length < 1) {
-            System.out.println("Usage: command <IP of Wall> <name of mic target>");
+        if (args.length != 1) {
+            System.out.println("Usage: command <IP of Wall>");
             System.out.println("Usage: command mics\t show all available audio sources");
             return;
         }
@@ -29,54 +29,37 @@ class Micro2Wall {
             displayMics();
             return;
         }
-        
-        String micname = args[1];
-        
-        KJDigitalSignalSynchronizer dss;
-        
-        Info info = getTarget(micname);
-        if (info == null) {
-            System.err.println("Cannot open Microphone");
-            return;
-        }
-        
-        if (!AudioSystem.isLineSupported(info)) {
-            // Handle the error ...
-            System.out.println("Not supported by microhone-API");
-            return;
-        }
-        // Obtain and open the line.
 
-
+        MonoSoundProcessor sp = new MonoSoundProcessor(address);
+        KJDigitalSignalSynchronizer dss = new KJDigitalSignalSynchronizer();
+        dss.add(sp);
+        
 //      AudioFormat format = new AudioFormat(22000, 16, 2, true, true);
         AudioFormat format = new AudioFormat(8000.0f, 16, 1, true, true);
         
-        TargetDataLine line = (TargetDataLine) AudioSystem.getLine(info);
-        line.open(format);
-        MonoSoundProcessor sp = new MonoSoundProcessor(address);
-
-        dss = new KJDigitalSignalSynchronizer();
-
-        dss.add(sp);
+        TargetDataLine line = getTargetDataLineForRecord(format);
+        final int frameSizeInBytes = format.getFrameSize();
+        final int bufferLengthInFrames = line.getBufferSize() / 8;
+        final int bufferLengthInBytes = bufferLengthInFrames * frameSizeInBytes;
+        final byte[] data = new byte[bufferLengthInBytes];
+        int numBytesRead;
+        line.start();
 
         SourceDataLine wSdl = AudioSystem.getSourceDataLine(line.getFormat());
-
-        // -- Open the source data line and start it.
-        wSdl.open();
-        wSdl.start();
-
         // -- Have the DSS monitor the source data line.
         dss.start(wSdl);
-
-        // -- Allocate a read buffer.
-        byte[] wRb = new byte[READ_BUFFER_SIZE];
-        int wRs = 0;
-
-        // -- Read from WAV file and write to DSS
-        while ((wRs = line.read(wRb, 0, READ_BUFFER_SIZE)) != -1) {
-            dss.writeAudioData(wRb, 0, wRs);
+        
+        while (line != null) {
+            if ((numBytesRead = line.read(data, 0, bufferLengthInBytes)) == -1) {
+                break;
+            }
+            dss.writeAudioData(data, 0, numBytesRead);
         }
-
+        // we reached the end of the stream. stop and close the line.
+        line.stop();
+        line.close();
+        line = null;
+        
         // -- EOF, stop monitoring source data line.
         dss.stop();
 
@@ -86,23 +69,21 @@ class Micro2Wall {
 
     }
     
-    private static Info getTarget(final String name) {
-        Mixer.Info[] mixerInfos = AudioSystem.getMixerInfo();
-        for (Mixer.Info info: mixerInfos){
-         Mixer m = AudioSystem.getMixer(info);
-         if (!info.getName().contains(name))
-             continue;
-         System.out.println ("found " + info.getName());
-         
-         
-         System.out.println("=== Targets ===");
-         Info[] lineInfos = m.getTargetLineInfo();
-         for (Line.Info lineInfo:lineInfos){
-             return lineInfo;
-         }
-        }
-        return null;
-    }
+    private static TargetDataLine getTargetDataLineForRecord(AudioFormat format) {  
+        TargetDataLine line;  
+        final DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);  
+        if (!AudioSystem.isLineSupported(info)) {  
+          return null;  
+        }  
+        // get and open the target data line for capture.  
+        try {  
+          line = (TargetDataLine) AudioSystem.getLine(info);  
+          line.open(format, line.getBufferSize());  
+        } catch (final Exception ex) {  
+          return null;  
+        }  
+        return line;  
+      }
 
     /**
      * List available audio sources
