@@ -14,7 +14,6 @@ class CircleSound {
 	private static final int READ_BUFFER_SIZE = 1024 * 4;
 
 	public static void main(String args[]) throws Exception {
-		
 	    if (args.length != 2) {
 	        System.out.println("Usage: <IP of Wall> <MP3 to visualize>");
 	        return;
