@@ -77,6 +77,7 @@ public class MonoSoundProcessor implements KJDigitalSignalProcessor {
 	        return;
 	    
 		float[][] pChannels = arg0.getDataNormalized();
+//		System.out.println("Channels : " + pChannels.length);
 		
 		float pFrrh = arg0.getFrameRatioHint();
 		
