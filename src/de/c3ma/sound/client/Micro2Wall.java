@@ -8,7 +8,6 @@ import javax.sound.sampled.TargetDataLine;
 
 import kjdss.KJDigitalSignalSynchronizer;
 import de.c3ma.sound.api.MonoSoundProcessor;
-import de.c3ma.sound.api.SoundProcessor_3Part;
 
 class Micro2Wall {
     private static final int READ_BUFFER_SIZE = 1024 * 4;
@@ -33,6 +32,8 @@ class Micro2Wall {
                                                                               // object
         if (!AudioSystem.isLineSupported(info)) {
             // Handle the error ...
+            System.out.println("Not supported by microhone-API");
+            return;
         }
         // Obtain and open the line.
 
